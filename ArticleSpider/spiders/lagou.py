@@ -7,11 +7,15 @@ from scrapy.spiders import CrawlSpider, Rule
 from items import LagouJobItem, LagouJobItemLoader
 from ArticleSpider.utils.common import get_md5
 
+from scrapy_redis.spiders import RedisCrawlSpider
 
-class LagouSpider(CrawlSpider):
+
+class LagouSpider(RedisCrawlSpider):
+    # class LagouSpider(CrawlSpider):
     name = 'lagou'
     allowed_domains = ['www.lagou.com']
-    start_urls = ['https://www.lagou.com/']
+    # start_urls = ['https://www.lagou.com/']
+    redis_key = 'lagou:start_urls'
 
     custom_settings = {
         "COOKIES_ENABLED": False,

@@ -27,7 +27,7 @@ ROBOTSTXT_OBEY = False
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 10
+DOWNLOAD_DELAY = 5
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
@@ -71,7 +71,8 @@ ITEM_PIPELINES = {
    #  'scrapy.pipelines.images.ImagesPipeline': 1,
    #  'ArticleSpider.pipelines.DefaultValuesPipeline': 3,
    #  'ArticleSpider.pipelines.ArticleImagePipeline': 2,
-    'ArticleSpider.pipelines.MysqlTwistedPipeline': 5
+    'ArticleSpider.pipelines.MysqlTwistedPipeline': 5,
+    # 'scrapy_redis.pipelines.RedisPipeline': 300
 }
 IMAGES_URLS_FIELD = "front_image_url"
 project_dir = os.path.abspath(os.path.dirname(__file__))
@@ -117,3 +118,13 @@ MYSQL_PASSWORD = "root"
 
 SQL_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 SQL_DATE_FORMAT = "%Y-%m-%d"
+
+# # scrapy-redis相关设置
+# # Enables scheduling storing requests queue in redis.
+# SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+# # Ensure all spiders share same duplicates filter through redis.
+# DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+# # 允许暂停后,能保存进度
+# SCHEDULER_PERSIST = True
+# REDIS_HOST = '192.168.1.229'
+# REDIS_PORT = 6379

@@ -11,6 +11,8 @@ import MySQLdb.cursors
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.exporters import JsonItemExporter
 from twisted.enterprise import adbapi
+from models.es_types import ArticleType
+from w3lib.html import remove_tags
 
 
 class ArticlespiderPipeline(object):
@@ -118,6 +120,15 @@ class ArticleImagePipeline(ImagesPipeline):
             for ok, value in results:
                 image_file_path = value["path"]
             item["front_image_path"] = image_file_path
+
+        return item
+
+
+class ElasticsearchPipeline(object):
+    # 将数据写入到es中
+    def process_item(self, item, spider):
+        # 将item转换为es数据
+        item.save_to_es()
 
         return item
 

@@ -8,17 +8,20 @@
 import scrapy
 import datetime
 import re
+import redis
 from scrapy.loader import ItemLoader
 from scrapy.loader.processors import MapCompose, TakeFirst, Join
 
 from utils.common import extract_num
-from settings import SQL_DATETIME_FORMAT, SQL_DATE_FORMAT
+from settings import SQL_DATETIME_FORMAT
 
 from w3lib.html import remove_tags
 from models.es_types import ArticleType
 
 from elasticsearch_dsl.connections import connections
 es = connections.create_connection(ArticleType._doc_type.using)
+
+redis_cli = redis.StrictRedis()
 
 
 class ArticlespiderItem(scrapy.Item):
@@ -148,6 +151,8 @@ class JobBoleArticleItem(scrapy.Item):
 
         article.suggest = gen_suggests(ArticleType._doc_type.index, ((article.title, 10), (article.tags, 7)))
         article.save()
+        # 存入es时统计文档数
+        redis_cli.incr("jobbole_count")
 
         return
 
@@ -180,8 +185,14 @@ class ZhihuQuestionItem(scrapy.Item):
         topics = ",".join(self["topics"])
         url = self["url"][0]
         title = "".join(self["title"])
-        content = "".join(self["content"])
-        answer_num = extract_num("".join(self["answer_num"]))
+        try:
+            content = "".join(self["content"])
+        except BaseException:
+            content = "无"
+        try:
+            answer_num = extract_num("".join(self["answer_num"]))
+        except BaseException:
+            answer_num = 0
         comments_num = extract_num("".join(self["comments_num"]))
 
         if len(self["watch_user_num"]) == 2:
@@ -194,7 +205,7 @@ class ZhihuQuestionItem(scrapy.Item):
 
         crawl_time = datetime.datetime.now().strftime(SQL_DATETIME_FORMAT)
 
-        params = (zhihu_id, topics, url, topics, content, answer_num, comments_num,
+        params = (zhihu_id, topics, url, title, content, answer_num, comments_num,
                   watch_user_num, click_num, crawl_time)
 
         return insert_sql, params

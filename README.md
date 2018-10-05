@@ -1,4 +1,4 @@
 # IMSpider
-基于Python的爬虫
+Scrapy-based crawler.
 
-可以爬取伯乐在线、知乎和拉勾网。
+Collect data from three websites, jobbole, zhihu and lagou.
